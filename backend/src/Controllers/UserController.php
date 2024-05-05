@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Http\Request;
 use App\Http\Response;
 use App\Services\UserService;
+use App\Http\JWT;
 
 class UserController
 {
@@ -43,23 +44,34 @@ class UserController
 
     public function fetch(Request $request, Response $response)
     {
-        $authorization = $request::authorization();
-        $userService = UserService::fetch($authorization);
+        try {
+            JWT::verify($request::authorization());
+            $userService = UserService::fetch();
 
-        if (isset($userService['error'])) {
+            $response::json([
+                'error' => false,
+                'success' => true,
+                'data' => $userService,
+            ]);
+        } catch (\Firebase\JWT\ExpiredException $e) {
             $response::json([
                 'error' => true,
                 'success' => false,
-                'message' => $userService['error'],
+                'message' => 'The token provided has expired, please log in again. Error: ' . $e->getMessage(),
             ], 401);
-            return;
+        } catch (\UnexpectedValueException $e) {
+            $response::json([
+                'error' => true,
+                'success' => false,
+                'message' => 'The token providade is invalid. Error: ' . $e->getMessage(),
+            ], 401);
+        } catch (\Exception $e) {
+            $response::json([
+                'error' => true,
+                'success' => false,
+                'message' => 'An error occurred. Error: ' . $e->getMessage(),
+            ], 500);
         }
-
-        $response::json([
-            'error' => false,
-            'success' => true,
-            'data' => $userService,
-        ]);
     }
 
     public function delete(Request $request, Response $response, array $id)

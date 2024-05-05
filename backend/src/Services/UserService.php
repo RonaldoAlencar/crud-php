@@ -49,14 +49,9 @@ class UserService
         }
     }
 
-    public static function fetch(mixed $authorization)
+    public static function fetch()
     {
         try {
-            if (isset($authorization['error'])) return ['error' => $authorization['error']];
-
-            $userFromJWT = JWT::verify($authorization);
-            if (!$userFromJWT) return ['error' => 'Please, log in to access this route.'];
-
             $user = User::findAllUsers();
             return $user;
         } catch (PDOException $e) {

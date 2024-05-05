@@ -3,6 +3,8 @@
 namespace App\Http;
 use Firebase\JWT\JWT as FirebaseJWT;
 use Firebase\JWT\Key;
+use Firebase\JWT\ExpiredException;
+use Firebase\JWT\UnexpectedValueException;
 
 class JWT 
 {
@@ -26,8 +28,10 @@ class JWT
         try {
             $decoded = FirebaseJWT::decode($jwt, new Key(self::$secret, 'HS256'));
             return (array) $decoded;
+        } catch (\Firebase\JWT\ExpiredException $e) {
+            throw new \Firebase\JWT\ExpiredException($e->getMessage());
         } catch (\Exception $e) {
-            return null;
-        }
+            throw new \UnexpectedValueException($e->getMessage());
+        } 
     }
 }
