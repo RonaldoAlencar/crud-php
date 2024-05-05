@@ -29,9 +29,9 @@ class JWT
             $decoded = FirebaseJWT::decode($jwt, new Key(self::$secret, 'HS256'));
             return (array) $decoded;
         } catch (\Firebase\JWT\ExpiredException $e) {
-            throw new \Firebase\JWT\ExpiredException($e->getMessage());
+            return ['error' => 'The token provided has expired, please log in again. Error: ' . $e->getMessage()];
         } catch (\Exception $e) {
-            throw new \UnexpectedValueException($e->getMessage());
+            return ['error' => 'The token provided is invalid. Error: ' . $e->getMessage()];
         } 
     }
 }

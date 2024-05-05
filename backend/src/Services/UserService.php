@@ -61,13 +61,9 @@ class UserService
         }
     }
 
-    public static function delete(mixed $authorization, array $id)
+    public static function delete(array $id)
     {
-        try {
-            if (isset($authorization['error'])) return ['error' => $authorization['error']];
-            $userFromJWT = JWT::verify($authorization);
-            if (!$userFromJWT) return ['error' => 'Please, log in to access this route.'];
-    
+        try {    
             $user = User::delete($id[0]);
             if (!$user) return ['error' => 'User not found.'];
 
