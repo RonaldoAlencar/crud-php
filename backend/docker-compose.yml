@@ -1,0 +1,24 @@
+services:
+  php:
+    build: .
+    container_name: php
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html/
+    command: >
+      bash -c "composer install && apache2-foreground"
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: kabum
+      MYSQL_USER: user
+      MYSQL_PASSWORD: mysecretpassword
+    volumes:
+      - ./dump/schema.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./mysql:/var/lib/mysql
